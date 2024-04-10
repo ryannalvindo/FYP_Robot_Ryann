@@ -1,0 +1,7 @@
+{
+    "configuration": "cpu=atmega328old",
+    "board": "arduino:avr:nano",
+    "sketch": "FYP_Arduino\\Reading_Encoder\\Reading_Encoder.ino",
+    "port": "COM6",
+    "output": "../ArduinoOutput"
+}
