@@ -13,7 +13,7 @@ Encoder encoderMotor2(encoderPinA_Motor2, encoderPinB_Motor2);
 void setup()
 {
   // Initialize Serial communication
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop()

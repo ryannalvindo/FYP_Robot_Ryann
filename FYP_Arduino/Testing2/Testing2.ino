@@ -43,7 +43,7 @@ int motorSpeed1, motorSpeed2;
 
 void setup() {
   // Initialize Serial communication
-  Serial.begin(9600);
+  Serial.begin(115200);
 //  pinMode(encoderPinA_Motor1, INPUT); 
 //  pinMode(encoderPinB_Motor1, INPUT); 
 //  pinMode(encoderPinA_Motor2, INPUT); 

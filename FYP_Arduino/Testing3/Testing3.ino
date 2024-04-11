@@ -38,7 +38,7 @@ void setup() {
   digitalWrite(motorPin2B, LOW);
   
   // reverse
-  Serial.begin(9600);
+  Serial.begin(115200);
   pinMode(4,INPUT_PULLUP);
 }
 

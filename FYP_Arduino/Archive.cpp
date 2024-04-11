@@ -30,7 +30,7 @@ int motorSpeed;
 
 void setup() {
   // Initialize Serial communication
-  Serial.begin(9600);
+  Serial.begin(115200);
  
 
   // Set motor control pins as outputs

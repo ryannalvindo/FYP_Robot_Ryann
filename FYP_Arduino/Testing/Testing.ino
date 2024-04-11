@@ -37,7 +37,7 @@ PID pidMotor2(KP, KI, KD);
 
 void setup() {
   // Initialize Serial communication
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // Set motor control pins as outputs
   pinMode(motor1Pin1, OUTPUT);
