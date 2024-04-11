@@ -1,7 +1,7 @@
 #include <Encoder.h>
 
-// Define pins for the encoders
-#define encoderPinA_Motor1 2
+// Define pins for the encoders (only interrupts pin )
+#define encoderPinA_Motor1 2 
 #define encoderPinB_Motor1 4
 #define encoderPinA_Motor2 3
 #define encoderPinB_Motor2 5
@@ -18,16 +18,17 @@ void setup()
 
 void loop()
 {
+
   // Read the encoder value
   long encoderValue1 = encoderMotor1.read();
   long encoderValue2 = encoderMotor2.read();
 
   Serial.print("encoderPinA_Motor1:");
-  Serial.print(digitalRead(encoderValue1));
+  Serial.print(encoderValue1);
   Serial.print("\t");
 
   Serial.print("encoderPinB_Motor1:");
-  Serial.println(digitalRead(encoderValue2));
+  Serial.println(encoderValue2);
 
   delay(10);
 }
