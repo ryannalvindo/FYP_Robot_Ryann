@@ -1,6 +1,6 @@
 #include <Encoder.h>
 
-// Define pins for the encoders (only interrupts pin )
+// Define pins for the encoders (use interrupts pin in one of the signals)
 #define encoderPinA_Motor1 2 
 #define encoderPinB_Motor1 4
 #define encoderPinA_Motor2 3
