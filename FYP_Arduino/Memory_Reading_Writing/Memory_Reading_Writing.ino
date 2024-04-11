@@ -41,6 +41,6 @@ void loop()
     Serial.print(val);
     Serial.print(" is stored in ");
     Serial.println(address);
-    // increment the address
+    // increment the address by 4 byte
     address = address + 4;
 }
