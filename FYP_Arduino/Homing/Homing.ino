@@ -26,8 +26,8 @@
 
 // DEBUG
 #define ENCODER_DEBUG false
-#define EEPROM_DEBUG false
-#define LOOP_DEBUG false
+#define EEPROM_DEBUG true
+#define LOOP_DEBUG true
 
 // Define pins for the encoders (use interrupts pin in one of the signals)
 #define encoderPinA_Motor1 2
@@ -82,26 +82,27 @@ void loop()
   // Keep reading on the encoder value
   encoderValue1 = encoderMotor1.read();
   encoderValue2 = encoderMotor2.read();
-  
+
 #if LOOP_DEBUG
   Serial.print("encoderMotor1:");
   Serial.print(readingEeprom(address1 - 4));
   Serial.print(" is stored in ");
-  Serial.print(address1);
+  Serial.print(address1 - 4);
   Serial.print("\t\t encoderMotor2:");
   Serial.print(readingEeprom(address2 - 4));
   Serial.print(" is stored in ");
-  Serial.println(address2);
+  Serial.println(address2 - 4);
 #endif
-
-
-
 
   delay(10);
 }
 
 void TimerHandler1()
 {
+
+  static long oldEncoderValue1 = 0;
+  static long oldEncoderValue2 = 0;
+
 #if TIMER_INTERRUPT_DEBUG
   Serial.print("ITimer1 called, millis() = ");
   Serial.println(millis());
@@ -115,6 +116,11 @@ void TimerHandler1()
   Serial.print("encoderPinB_Motor1:");
   Serial.println(encoderValue2);
 #endif
+  // Do quit the timer when the old encoder values are the same as the new read values
+  if (encoderValue1 == oldEncoderValue1 && encoderValue2 == oldEncoderValue2)
+  {
+    return;
+  }
 
   // Writting encoder data from global variable into EEPROM
   writingEeprom(encoderValue1, address1);
@@ -134,6 +140,10 @@ void TimerHandler1()
   // increment the address by 4 byte
   address1 = address1 + 4;
   address2 = address2 + 4;
+
+  // update the old encoder value
+  oldEncoderValue1 = encoderValue1;
+  oldEncoderValue2 = encoderValue2;
 }
 
 void writingEeprom(long inputNum, long eepromAddress)
