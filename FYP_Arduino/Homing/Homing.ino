@@ -27,7 +27,8 @@
 // DEBUG
 #define ENCODER_DEBUG false
 #define EEPROM_DEBUG true
-#define LOOP_DEBUG true
+#define LOOP_DEBUG false
+#define SERIAL_INPUT_DEBUG true
 
 // Define pins for the encoders (use interrupts pin in one of the signals)
 #define encoderPinA_Motor1 2
@@ -75,13 +76,46 @@ void setup()
   }
   else
     Serial.println(F("Can't set ITimer1. Select another freq. or timer"));
+
+#if SERIAL_INPUT_DEBUG
+  Serial.println("Type \"H\" to start on Homing routine");
+#endif
 }
 
 void loop()
 {
-  // Keep reading on the encoder value
-  encoderValue1 = encoderMotor1.read();
-  encoderValue2 = encoderMotor2.read();
+  static bool homingStart = false;
+
+#if SERIAL_INPUT_DEBUG
+  static char userInput;
+  while (Serial.available() > 0)
+  {
+    // Read the next character
+    userInput = Serial.read();
+    Serial.println("You typed: " + String(userInput));
+    Serial.flush();
+  }
+
+  if (userInput == 'H')
+  {
+    homingStart = true;
+  }
+
+#endif
+
+  if (homingStart)
+  {
+    ITimer1.stopTimer();
+    Serial.println("Stopping the encoder reading now");
+    // TODO: applying goToTargetPos
+    
+  }
+  else
+  {
+    // Keep reading on the encoder value
+    encoderValue1 = encoderMotor1.read();
+    encoderValue2 = encoderMotor2.read();
+  }
 
 #if LOOP_DEBUG
   Serial.print("encoderMotor1:");
@@ -94,12 +128,11 @@ void loop()
   Serial.println(address2 - 4);
 #endif
 
-  delay(10);
+  delay(100);
 }
 
 void TimerHandler1()
 {
-
   static long oldEncoderValue1 = 0;
   static long oldEncoderValue2 = 0;
 
