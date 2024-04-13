@@ -1,7 +1,7 @@
 // These define's must be placed at the beginning before #include "TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
-#define TIMER_INTERRUPT_DEBUG 2
+#define TIMER_INTERRUPT_DEBUG 0 // 2
 #define _TIMERINTERRUPT_LOGLEVEL_ 0
 
 #define USE_TIMER_1 true
@@ -25,8 +25,9 @@
 #include <EEPROM.h>
 
 // DEBUG
-#define ENCODER_DEBUG true
-#define EEPROM_DEBUG true
+#define ENCODER_DEBUG false
+#define EEPROM_DEBUG false
+#define LOOP_DEBUG false
 
 // Define pins for the encoders (use interrupts pin in one of the signals)
 #define encoderPinA_Motor1 2
@@ -44,17 +45,23 @@ Encoder encoderMotor2(encoderPinA_Motor2, encoderPinB_Motor2);
 // Define global variables
 long address1 = 0;   // EEPROM address length is 1024
 long address2 = 512; // address 2 will start in the middle
+long encoderValue1;  // encoder value to be accessible throughout the whole file
+long encoderValue2;  // encoder value to be accessible throughout the whole file
 
 void setup()
 {
 
   Serial.begin(115200);
 
-  Serial.println(EEPROM.length());
+  // Clear EEPROM
+  for (int i = 0; i < EEPROM.length(); i++)
+  {
+    EEPROM.write(i, 0);
+  }
 
-  Serial.println(EEPROM.read(1022));
-  Serial.println(EEPROM.read(1));
-  return 0;
+  // First reading of the encoder value
+  encoderValue1 = encoderMotor1.read();
+  encoderValue2 = encoderMotor2.read();
 
   // Initialize timer interrupt for reading
   ITimer1.init();
@@ -72,6 +79,25 @@ void setup()
 
 void loop()
 {
+  // Keep reading on the encoder value
+  encoderValue1 = encoderMotor1.read();
+  encoderValue2 = encoderMotor2.read();
+  
+#if LOOP_DEBUG
+  Serial.print("encoderMotor1:");
+  Serial.print(readingEeprom(address1 - 4));
+  Serial.print(" is stored in ");
+  Serial.print(address1);
+  Serial.print("\t\t encoderMotor2:");
+  Serial.print(readingEeprom(address2 - 4));
+  Serial.print(" is stored in ");
+  Serial.println(address2);
+#endif
+
+
+
+
+  delay(10);
 }
 
 void TimerHandler1()
@@ -80,10 +106,6 @@ void TimerHandler1()
   Serial.print("ITimer1 called, millis() = ");
   Serial.println(millis());
 #endif
-
-  // Read the encoder value
-  long encoderValue1 = encoderMotor1.read();
-  long encoderValue2 = encoderMotor2.read();
 
 #if ENCODER_DEBUG
   Serial.print("encoderPinA_Motor1:");
@@ -94,16 +116,16 @@ void TimerHandler1()
   Serial.println(encoderValue2);
 #endif
 
-  // Writting ecoder data into EEPROM
+  // Writting encoder data from global variable into EEPROM
   writingEeprom(encoderValue1, address1);
   writingEeprom(encoderValue2, address2);
 
 #if EEPROM_DEBUG
-  Serial.print("encoderPinA_Motor1:");
+  Serial.print("encoder_Motor1:");
   Serial.print(readingEeprom(address1));
   Serial.print(" is stored in ");
   Serial.print(address1);
-  Serial.print("\t\t encoderPinA_Motor2:");
+  Serial.print("\t\t encoder_Motor2:");
   Serial.print(readingEeprom(address2));
   Serial.print(" is stored in ");
   Serial.println(address2);
