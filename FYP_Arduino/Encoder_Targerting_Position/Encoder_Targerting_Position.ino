@@ -1,6 +1,7 @@
 // Debugger
 #define BAILEY_MOTOR_D false
 #define RYANN_MOTOR_D true
+#define ENCODER_DEBUG false
 
 
 #include <Encoder.h>
@@ -150,11 +151,13 @@ void goToTargetEncoderValue(long targetEncoderValue, uint8_t motor_pin_1, uint8_
     // Set motor speed
     analogWrite(enable_pin, abs(motorSpeed));
 
+#if ENCODER_DEBUG
     // Debug monitoring
     Serial.print("encoder:" + String(encoderValue) + "\t");
     Serial.print("target:" + String(targetEncoderValue) + "\t");
     Serial.print("output:" + String(abs(output)) + "\t");
     Serial.println("motorSpeed:" + String((motorSpeed)));
+#endif
 
     // Check if motor has reached target encoder value
     if (abs(error) < 100)
