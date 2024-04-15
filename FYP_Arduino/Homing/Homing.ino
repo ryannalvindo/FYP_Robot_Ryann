@@ -123,6 +123,7 @@ void loop()
   if (userInput == 'H')
   {
     homingStart = true;
+    userInput = 0;
   }
 
 #endif
@@ -134,8 +135,6 @@ void loop()
     // TODO: applying goToTargetPos for 2 wheels
     do
     {
-      address1 = address1 -4;
-      address1 = address1 -4;
       long targetMotor1 = readingEeprom(address1);
       long targetMotor2 = readingEeprom(address2);
 
@@ -194,6 +193,10 @@ void TimerHandler1()
     return;
   }
 
+  // increment the new addresses by 4 byte
+  address1 = address1 + 4;
+  address2 = address2 + 4;
+
   // Writting encoder data from global variable into EEPROM
   writingEeprom(encoderValue1, address1);
   writingEeprom(encoderValue2, address2);
@@ -208,10 +211,6 @@ void TimerHandler1()
   Serial.print(" is stored in ");
   Serial.println(address2);
 #endif
-
-  // increment the address by 4 byte
-  address1 = address1 + 4;
-  address2 = address2 + 4;
 
   // update the old encoder value
   oldEncoderValue1 = encoderValue1;
