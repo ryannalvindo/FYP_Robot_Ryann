@@ -1,7 +1,7 @@
 // Debugger
 #define BAILEY_MOTOR_D false
 #define RYANN_MOTOR_D true
-#define ENCODER_DEBUG false
+#define ENCODER_DEBUG true
 
 
 #include <Encoder.h>
@@ -17,7 +17,7 @@
 #elif RYANN_MOTOR_D
 #define motorPin1 8
 #define motorPin2 9
-#define enablePin 10
+#define enablePin 7
 #endif
 
 // PID constants
@@ -105,8 +105,8 @@ void goToTargetEncoderValue(long targetEncoderValue, uint8_t motor_pin_1, uint8_
     // Read the encoder value
     long encoderValue = myEncoder.read();
 
-    unsigned long now = millis();
-    double timeChange = (double)(now - lastTime);
+    unsigned long now = micros();
+    double timeChange = (double)(now - lastTime)/1.0e6;
     // Calculate the error between target and current encoder value
     error = targetEncoderValue - encoderValue;
 
@@ -160,7 +160,7 @@ void goToTargetEncoderValue(long targetEncoderValue, uint8_t motor_pin_1, uint8_
 #endif
 
     // Check if motor has reached target encoder value
-    if (abs(error) < 100)
+    if (abs(error) < 10)
     {
       // Stop the motor
       analogWrite(enable_pin, 0);
