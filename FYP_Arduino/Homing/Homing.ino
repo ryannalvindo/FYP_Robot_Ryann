@@ -23,6 +23,7 @@
 #include <TimerInterrupt.h>
 #include <Encoder.h>
 #include "eeprom_routine.h"
+#include "PID_routine.h"
 
 // DEBUG
 #define ENCODER_DEBUG true
@@ -156,13 +157,13 @@ void loop()
       long targetMotor1 = readingEeprom(address1);
       long targetMotor2 = readingEeprom(address2);
 
-      goToTargetEncoderValue(targetMotor1, targetMotor2, motor1Pin1, motor1Pin2, enablePin1, motor2Pin2, motor2Pin2, enablePin2);
+      goToTargetPos(encoderMotor1, targetMotor1, encoderMotor2, targetMotor2, motor1Pin1, motor1Pin2, enablePin1, motor2Pin1, motor2Pin2, enablePin2);
       address1 = address1 - 4;
       address2 = address2 - 4;
     } while (address1 != 0 && address2 != 512);
 
     // Final step going to origin
-    goToTargetEncoderValue(0, 0, motor1Pin1, motor1Pin2, enablePin1, motor2Pin2, motor2Pin2, enablePin2);
+    goToTargetPos(encoderMotor1, 0, encoderMotor2, 0, motor1Pin1, motor1Pin2, enablePin1, motor2Pin1, motor2Pin2, enablePin2);
     homingStart = false;
   }
   else
@@ -234,127 +235,3 @@ void TimerHandler1()
   oldEncoderValue2 = encoderValue2;
 }
 
-void goToTargetEncoderValue(long targetEncoderValue1, long targetEncoderValue2, uint8_t motor1_pin_1, uint8_t motor1_pin_2, uint8_t enable_pin_1, uint8_t motor2_pin_1, uint8_t motor2_pin_2, uint8_t enable_pin_2)
-{
-
-  // declare variable
-  static float error1, lastError1, error2, lastError2, integral1, derivative1, output1, integral2, derivative2, output2;
-  static unsigned long lastTime;
-  static int motorSpeed1, motorSpeed2;
-
-  while (true)
-  {
-
-    // Read the encoder value
-    long encoderValue1 = encoderMotor1.read();
-    long encoderValue2 = encoderMotor2.read();
-
-    unsigned long now = millis();
-    double timeChange = (double)(now - lastTime);
-    // Calculate the error between target and current encoder value
-    error1 = targetEncoderValue1 - encoderValue1;
-    error2 = targetEncoderValue2 - encoderValue2;
-
-    // Calculate integral and derivative terms
-    integral1 += error1 * timeChange;
-    derivative1 = (error1 - lastError1) / timeChange;
-    integral2 += error2 * timeChange;
-    derivative2 = (error2 - lastError2) / timeChange;
-
-    // Calculate the output using PID control
-    output1 = KP * error1 + KI * integral1 + KD * derivative1;
-    output2 = KP * error2 + KI * integral2 + KD * derivative2;
-
-    // Update last error1
-    lastError1 = error1;
-    lastError2 = error2;
-    lastTime = now;
-
-    // Set motor speed based on PID output
-    motorSpeed1 = constrain(output1 / 100, -255, 255); // the speed is the ratio of the output
-    motorSpeed2 = constrain(output2 / 100, -255, 255); // the speed is the ratio of the output
-
-    // Set motor1 direction based on the sign of the motor speed
-    if (motorSpeed1 > 0)
-    {
-      digitalWrite(motor1_pin_1, HIGH);
-#if RYANN_MOTOR_D
-      digitalWrite(motor1_pin_2, LOW);
-#endif
-    }
-    else if (motorSpeed1 < 0)
-    {
-      digitalWrite(motor1_pin_1, LOW);
-#if RYANN_MOTOR_D
-      digitalWrite(motor1_pin_2, HIGH);
-#endif
-    }
-    else
-    {
-#if RYANN_MOTOR_D
-      digitalWrite(motor1_pin_1, LOW);
-      digitalWrite(motor1_pin_2, LOW);
-#endif
-    }
-
-    // Set motor2 direction based on the sign of the motor speed
-    if (motorSpeed2 > 0)
-    {
-      digitalWrite(motor2_pin_1, HIGH);
-#if RYANN_MOTOR_D
-      digitalWrite(motor2_pin_2, LOW);
-#endif
-    }
-    else if (motorSpeed2 < 0)
-    {
-      digitalWrite(motor2_pin_1, LOW);
-#if RYANN_MOTOR_D
-      digitalWrite(motor2_pin_2, HIGH);
-#endif
-    }
-    else
-    {
-#if RYANN_MOTOR_D
-      digitalWrite(motor2_pin_1, LOW);
-      digitalWrite(motor2_pin_2, LOW);
-#endif
-    }
-
-    // Set motor speed
-    analogWrite(enable_pin_1, abs(motorSpeed1));
-    analogWrite(enable_pin_2, abs(motorSpeed2));
-
-#if ENCODER_DEBUG
-    // Debug monitoring
-    Serial.print("encoder1:" + String(encoderValue1) + "\t");
-    Serial.print("target:" + String(targetEncoderValue1) + "\t");
-    Serial.print("output:" + String(abs(output2)) + "\t");
-    Serial.println("motorSpeed:" + String((motorSpeed1)));
-    // Debug monitoring
-    Serial.print("encoder2:" + String(encoderValue2) + "\t");
-    Serial.print("target:" + String(targetEncoderValue2) + "\t");
-    Serial.print("output:" + String(abs(output2)) + "\t");
-    Serial.println("motorSpeed:" + String((motorSpeed2)));
-#endif
-
-    // Check if motor has reached target encoder value
-    if (abs(error1) < 10 && abs(error2) < 10)
-    {
-      // Stop the motor
-      analogWrite(enable_pin_1, 0);
-      analogWrite(enable_pin_2, 0);
-      break;
-    }
-    else if (abs(error1) < 10)
-    {
-      analogWrite(enable_pin_1, 0);
-    }
-    else if (abs(error2) < 10)
-    {
-      analogWrite(enable_pin_2, 0);
-    }
-
-    // Add a delay to avoid excessive readings
-    delay(100);
-  }
-}
