@@ -72,8 +72,6 @@ void goToTargetPos(Encoder &encoder1, long targetPos1, Encoder &encoder2, long t
     output_1 = pidController(targetPos1, encoder1, &lastError_1, &eIntegral_1, &lastTime_1);
     output_2 = pidController(targetPos2, encoder2, &lastError_2, &eIntegral_2, &lastTime_2);
 
-    
-
     motorSpeed_1 = constrain(output_1, -255, 255);
     motorSpeed_2 = constrain(output_2, -255, 255);
 
