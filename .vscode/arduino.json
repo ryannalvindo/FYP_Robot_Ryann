@@ -1,7 +1,7 @@
 {
     "configuration": "cpu=atmega328old",
     "board": "arduino:avr:nano",
-    "sketch": "FYP_Arduino\\Encoder_Targeting_Position\\Encoder_Targeting_Position.ino",
+    "sketch": "FYP_Arduino\\Homing\\Homing.ino",
     "port": "COM6",
     "output": "../ArduinoOutput"
 }
