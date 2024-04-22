@@ -1,3 +1,4 @@
+//****************************************************************************************/
 // These define's must be placed at the beginning before #include "TimerInterrupt.h"
 // _TIMERINTERRUPT_LOGLEVEL_ from 0 to 4
 // Don't define _TIMERINTERRUPT_LOGLEVEL_ > 0. Only for special ISR debugging only. Can hang the system.
@@ -18,6 +19,7 @@
 #define USE_TIMER_3 true
 #warning Using Timer1, Timer3
 #endif
+//****************************************************************************************/
 
 // Define libraries
 #include <TimerInterrupt.h>
