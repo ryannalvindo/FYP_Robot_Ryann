@@ -7,16 +7,16 @@
 #include "PID_routine.h"
 
 // Define pins for the encoders (use interrupts pin in one of the signals)
-#define encoderPinA_Motor1 2
-#define encoderPinB_Motor1 4
-#define encoderPinA_Motor2 3
-#define encoderPinB_Motor2 5
+#define encoder_A_Left 2
+#define encoder_B_Left 4
+#define encoder_A_Right 3
+#define encoder_B_Right 5
 // Define pins for motor control
 #if BAILEY_MOTOR_D
-#define motor1Pin 5
-#define speed1Pin 9
-#define motor2Pin 5
-#define speed2Pin 9
+#define motorLeft 7
+#define speedLeft 6
+#define motorRight 10
+#define speedRight 9
 #elif RYANN_MOTOR_D
 #define motor1Pin1 8
 #define motor1Pin2 9
@@ -28,12 +28,12 @@
 
 // Target encoder value
 // #define TARGET_ENCODER_VALUE 100
-long targetMotor1 = 1000;
-long targetMotor2 = 1000;
+long targetmotorLeft = 13500;
+long targetmotorRight = 0;
 
 // Create Encoder objects for both motors
-Encoder encoderMotor1(encoderPinA_Motor1, encoderPinB_Motor1);
-Encoder encoderMotor2(encoderPinA_Motor2, encoderPinB_Motor2);
+Encoder encoderLeft(encoder_A_Left, encoder_B_Left);
+Encoder encoderRight(encoder_A_Right, encoder_B_Right);
 
 void setup()
 {
@@ -43,10 +43,10 @@ void setup()
 // Set motor control pins as outputs
 #if BAILEY_MOTOR_D
   Serial.println("BAILEY SETTING IS USED");
-  pinMode(motor1Pin, OUTPUT);
-  pinMode(motor2Pin, OUTPUT);
-  pinMode(speed1Pin, OUTPUT);
-  pinMode(speed2Pin, OUTPUT);
+  pinMode(motorLeft, OUTPUT);
+  pinMode(speedLeft, OUTPUT);
+  pinMode(motorRight, OUTPUT);
+  pinMode(speedRight, OUTPUT);
 #elif RYANN_MOTOR_D
   pinMode(motor1Pin1, OUTPUT);
   pinMode(motor1Pin2, OUTPUT);
@@ -58,9 +58,9 @@ void setup()
   
 
 #if BAILEY_MOTOR_D
-  goToTargetPos(encoderMotor1, targetMotor1, encoderMotor2, targetMotor2, motor1Pin, 0, speed1Pin, motor2Pin, 0, speed2Pin);
+  goToTargetPos(encoderLeft, targetmotorLeft, encoderRight, targetmotorRight, motorLeft, speedLeft, motorRight, speedRight);
 #elif RYANN_MOTOR_D
-  goToTargetPos(encoderMotor1, targetMotor1, encoderMotor2, targetMotor2, motor1Pin1, motor1Pin2, enablePin1, motor2Pin1, motor2Pin2, enablePin2);
+  goToTargetPos(encoderLeft, targetMotor1, encoderRight, targetMotor2, motor1Pin1, motor1Pin2, enablePin1, motor2Pin1, motor2Pin2, enablePin2);
 #endif
 
 
@@ -68,5 +68,18 @@ void setup()
 
 void loop()
 {
+
+  //ask user to type in the serial monitor (limited to vowel and a-g)
+  Serial.println("Type targeted position for right wheel");
+  Serial.flush();
+  while(Serial.available() == 0){
+    //do nothing
+  }
+  while(Serial.available() > 0){
+    targetmotorRight = Serial.parseInt(SKIP_ALL);  //read string until newline
+  }
+  goToTargetPos(encoderLeft, targetmotorLeft, encoderRight, targetmotorRight, motorLeft, speedLeft, motorRight, speedRight);
+
+  delay(1000);
 
 }

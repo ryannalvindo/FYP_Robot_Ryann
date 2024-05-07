@@ -1,6 +1,6 @@
 #ifndef PID_ROUTINE_H
 #define PID_ROUTINE_H
 
-void goToTargetPos (Encoder &encoder1, long targetPos1, Encoder &encoder2, long targetPos2, uint8_t motor1_pin_1, uint8_t motor1_pin_2, uint8_t enable_pin1, uint8_t motor2_pin_1, uint8_t motor2_pin_2, uint8_t enable_pin2);
+void goToTargetPos(Encoder &encoder_left, long target_pos_left, Encoder &encoder_right, long target_pos_right, uint8_t motorLeft, uint8_t speedLeft, uint8_t motorRight, uint8_t speedRight);
 
 #endif
