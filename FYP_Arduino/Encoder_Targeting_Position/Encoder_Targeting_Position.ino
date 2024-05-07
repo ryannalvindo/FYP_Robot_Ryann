@@ -28,8 +28,8 @@
 
 // Target encoder value
 // #define TARGET_ENCODER_VALUE 100
-long targetmotorLeft = 13500;
-long targetmotorRight = 0;
+long target_motor_left = 13500;
+long target_motor_right = 0;
 
 // Create Encoder objects for both motors
 Encoder encoderLeft(encoder_A_Left, encoder_B_Left);
@@ -58,7 +58,7 @@ void setup()
   
 
 #if BAILEY_MOTOR_D
-  goToTargetPos(encoderLeft, targetmotorLeft, encoderRight, targetmotorRight, motorLeft, speedLeft, motorRight, speedRight);
+  goToTargetPos(encoderLeft, target_motor_left, encoderRight, target_motor_right, motorLeft, speedLeft, motorRight, speedRight);
 #elif RYANN_MOTOR_D
   goToTargetPos(encoderLeft, targetMotor1, encoderRight, targetMotor2, motor1Pin1, motor1Pin2, enablePin1, motor2Pin1, motor2Pin2, enablePin2);
 #endif
@@ -76,9 +76,9 @@ void loop()
     //do nothing
   }
   while(Serial.available() > 0){
-    targetmotorRight = Serial.parseInt(SKIP_ALL);  //read string until newline
+    target_motor_right = Serial.parseInt(SKIP_ALL);  //read string until newline
   }
-  goToTargetPos(encoderLeft, targetmotorLeft, encoderRight, targetmotorRight, motorLeft, speedLeft, motorRight, speedRight);
+  goToTargetPos(encoderLeft, target_motor_left, encoderRight, target_motor_right, motorLeft, speedLeft, motorRight, speedRight);
 
   delay(1000);
 
