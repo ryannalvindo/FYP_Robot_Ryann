@@ -90,8 +90,8 @@ Encoder encoderRight(18, 19);
 // Define global variables
 long address1 = 0;   // EEPROM address length is 1024
 long address2 = 512; // address 2 will start in the middle
-long encoderValue1;  // encoder value to be accessible throughout the whole file
-long encoderValue2;  // encoder value to be accessible throughout the whole file
+long encoder_value_left;  // encoder value to be accessible throughout the whole file
+long encoder_value_right;  // encoder value to be accessible throughout the whole file
 
 
 #define USE_BASE      // Enable the base controller code
@@ -349,8 +349,8 @@ void setup() {
   #endif
 
   // First reading of the encoder value
-  encoderValue1 = encoderLeft.read();
-  encoderValue2 = encoderRight.read();
+  encoder_value_left = encoderLeft.read();
+  encoder_value_right = encoderRight.read();
   // Initialize timer interrupt for reading
   ITimer1.init();
 
@@ -377,8 +377,8 @@ void loop() {
     chr = Serial.read();
 
     // Keep reading on the encoder value
-    encoderValue1 = encoderLeft.read();
-    encoderValue2 = encoderRight.read();
+    encoder_value_left = encoderLeft.read();
+    encoder_value_right = encoderRight.read();
 
     // Terminate a command with a CR
     if (chr == 13) {
@@ -442,8 +442,8 @@ void loop() {
 
 void TimerHandler1()
 {
-  static long oldEncoderValue1 = 0;
-  static long oldEncoderValue2 = 0;
+  static long old_encoder_value_left = 0;
+  static long old_encoder_value_right = 0;
 
 #if TIMER_INTERRUPT_DEBUG
   Serial.print("ITimer1 called, millis() = ");
@@ -452,14 +452,14 @@ void TimerHandler1()
 
 #if ENCODER_DEBUG
   Serial.print("encoderPinA_Motor1:");
-  Serial.print(encoderValue1);
+  Serial.print(encoder_value_left);
   Serial.print("\t");
 
   Serial.print("encoderPinB_Motor1:");
-  Serial.println(encoderValue2);
+  Serial.println(encoder_value_right);
 #endif
   // Do quit the timer when the old encoder values are the same as the new read values
-  if (encoderValue1 == oldEncoderValue1 && encoderValue2 == oldEncoderValue2)
+  if (encoder_value_left == old_encoder_value_left && encoder_value_right == old_encoder_value_right)
   {
     return;
   }
@@ -469,8 +469,8 @@ void TimerHandler1()
   address2 = address2 + 4;
 
   // Writting encoder data from global variable into EEPROM
-  writingEeprom(encoderValue1, address1);
-  writingEeprom(encoderValue2, address2);
+  writingEeprom(encoder_value_left, address1);
+  writingEeprom(encoder_value_right, address2);
 
 #if EEPROM_DEBUG
   Serial.print("encoder_Motor1:");
@@ -484,7 +484,7 @@ void TimerHandler1()
 #endif
 
   // update the old encoder value
-  oldEncoderValue1 = encoderValue1;
-  oldEncoderValue2 = encoderValue2;
+  old_encoder_value_left = encoder_value_left;
+  old_encoder_value_right = encoder_value_right;
 }
 
