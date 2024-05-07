@@ -84,8 +84,8 @@
 #define TIMER1_DURATION_MS 0
 
 // Create Encoder objects for both motors
-Encoder encoderMotor1(2, 3);
-Encoder encoderMotor2(18, 19);
+Encoder encoderLeft(2, 3);
+Encoder encoderRight(18, 19);
 
 // Define global variables
 long address1 = 0;   // EEPROM address length is 1024
@@ -239,16 +239,16 @@ int runCommand() {
     // TODO: applying goToTargetPos for 2 wheels
     do
     {
-      long targetMotor1 = readingEeprom(address1);
-      long targetMotor2 = readingEeprom(address2);
+      long target_motor_left = readingEeprom(address1);
+      long target_motor_right = readingEeprom(address2);
 
-      goToTargetPos(encoderMotor1, targetMotor1, encoderMotor2, targetMotor2, LEFT_MOTOR_MODE, 0, LEFT_MOTOR_SPD, RIGHT_MOTOR_MODE, 0, RIGHT_MOTOR_SPD);
+      goToTargetPos(encoderLeft, target_motor_left, encoderRight, target_motor_right, LEFT_MOTOR_MODE, LEFT_MOTOR_SPD, RIGHT_MOTOR_MODE, RIGHT_MOTOR_SPD);
       address1 = address1 - 4;
       address2 = address2 - 4;
     } while (address1 != 0 && address2 != 512);
 
     // Final step going to origin
-    goToTargetPos(encoderMotor1, 0, encoderMotor2, 0, LEFT_MOTOR_MODE, 0, LEFT_MOTOR_SPD, RIGHT_MOTOR_MODE, 0, RIGHT_MOTOR_SPD);
+    goToTargetPos(encoderLeft, 0, encoderRight, 0, LEFT_MOTOR_MODE, LEFT_MOTOR_SPD, RIGHT_MOTOR_MODE, RIGHT_MOTOR_SPD);
     break;
 
 #ifdef USE_SERVOS
@@ -349,8 +349,8 @@ void setup() {
   #endif
 
   // First reading of the encoder value
-  encoderValue1 = encoderMotor1.read();
-  encoderValue2 = encoderMotor2.read();
+  encoderValue1 = encoderLeft.read();
+  encoderValue2 = encoderRight.read();
   // Initialize timer interrupt for reading
   ITimer1.init();
 
@@ -377,8 +377,8 @@ void loop() {
     chr = Serial.read();
 
     // Keep reading on the encoder value
-    encoderValue1 = encoderMotor1.read();
-    encoderValue2 = encoderMotor2.read();
+    encoderValue1 = encoderLeft.read();
+    encoderValue2 = encoderRight.read();
 
     // Terminate a command with a CR
     if (chr == 13) {
